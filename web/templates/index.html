@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>J.A.R.V.I.S — Painel de Controle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#04070a;
+  --panel:#070d13;
+  --panel-2:#0b141c;
+  --line: rgba(90,210,255,.28);
+  --cyan:#3fe3ff;
+  --cyan-dim:#1a8fae;
+  --amber:#ff9d42;
+  --text:#cfe9f2;
+  --muted:#5f8494;
+  --danger:#ff5b5b;
+  --radius:2px;
+}
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  margin:0;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(30,90,120,.18), transparent 60%),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.015) 0px, rgba(255,255,255,.015) 1px, transparent 1px, transparent 3px),
+    var(--bg);
+  color:var(--text);
+  font-family:'Rajdhani',sans-serif;
+  min-height:100vh;
+  padding:22px 26px 40px;
+}
+.eyebrow{
+  font-family:'Share Tech Mono',monospace;
+  font-size:11px;
+  letter-spacing:.35em;
+  color:var(--cyan-dim);
+  text-align:center;
+  margin:0 0 4px;
+}
+h1.title{
+  font-family:'Orbitron',sans-serif;
+  font-weight:900;
+  font-size:clamp(22px,3.4vw,34px);
+  letter-spacing:.28em;
+  text-align:center;
+  margin:0 0 22px;
+  color:var(--cyan);
+  text-shadow:0 0 18px rgba(63,227,255,.55), 0 0 46px rgba(63,227,255,.18);
+}
+.grid{
+  display:grid;
+  grid-template-columns: 250px minmax(320px,520px) 250px;
+  gap:18px;
+  max-width:1180px;
+  margin:0 auto;
+  align-items:start;
+}
+@media (max-width: 920px){
+  .grid{grid-template-columns:1fr; max-width:520px;}
+}
+.panel{
+  background:linear-gradient(180deg, var(--panel-2), var(--panel));
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  position:relative;
+  padding:16px 14px 18px;
+}
+.panel::before{
+  content:'';
+  position:absolute; inset:0;
+  border:1px solid rgba(63,227,255,.06);
+  pointer-events:none;
+  clip-path:polygon(0 10px,10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%);
+}
+.panel h2{
+  font-family:'Orbitron',sans-serif;
+  font-size:12.5px;
+  letter-spacing:.22em;
+  color:var(--cyan);
+  margin:0 0 12px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-bottom:1px solid var(--line);
+  padding-bottom:8px;
+}
+.panel h2 span.count{
+  font-family:'Share Tech Mono',monospace;
+  font-size:10px;
+  color:var(--muted);
+}
+
+/* ---- source items (browsers / apps) ---- */
+.item{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:9px 8px;
+  border:1px solid transparent;
+  border-radius:var(--radius);
+  cursor:pointer;
+  transition:border-color .15s, background .15s;
+  user-select:none;
+}
+.item:hover{ border-color:var(--line); background:rgba(63,227,255,.05); }
+.item.open{ border-color:var(--cyan-dim); background:rgba(63,227,255,.08); }
+.item .ic{
+  width:30px;height:30px;flex:0 0 30px;
+  border:1px solid var(--cyan-dim);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--cyan);
+}
+.item .ic svg{ width:16px; height:16px; }
+.item .lbl{ font-weight:600; font-size:14.5px; letter-spacing:.03em; flex:1; }
+.item .chev{ color:var(--muted); font-size:11px; transition:transform .2s; }
+.item.open .chev{ transform:rotate(90deg); color:var(--cyan); }
+.item .close-x{
+  color:var(--muted); font-size:12px; cursor:pointer; padding:2px 4px;
+}
+.item .close-x:hover{ color:var(--danger); }
+
+.sublist{
+  max-height:0;
+  overflow:hidden;
+  transition:max-height .25s ease;
+  padding-left:14px;
+  border-left:1px solid rgba(63,227,255,.15);
+  margin:0 0 2px 15px;
+}
+.item.open + .sublist{ max-height:400px; }
+.sublist a, .sublist .row{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:6px;
+  padding:6px 6px;
+  font-family:'Share Tech Mono',monospace;
+  font-size:12px;
+  color:var(--text);
+  text-decoration:none;
+  border-bottom:1px dashed rgba(63,227,255,.08);
+}
+.sublist a:hover{ color:var(--cyan); }
+.sublist a::before{ content:'▸ '; color:var(--cyan-dim); }
+
+.add-row{
+  margin-top:6px;
+  font-family:'Share Tech Mono',monospace;
+  font-size:11.5px;
+  color:var(--amber);
+  background:none;
+  border:1px dashed rgba(255,157,66,.4);
+  border-radius:var(--radius);
+  padding:7px 8px;
+  width:100%;
+  cursor:pointer;
+  letter-spacing:.06em;
+}
+.add-row:hover{ background:rgba(255,157,66,.08); }
+
+.mini-form{
+  display:none;
+  margin-top:8px;
+  padding:10px;
+  border:1px solid var(--line);
+  background:rgba(0,0,0,.25);
+  gap:7px;
+}
+.mini-form.show{ display:flex; flex-direction:column; }
+.mini-form input{
+  background:var(--bg);
+  border:1px solid var(--cyan-dim);
+  color:var(--text);
+  font-family:'Share Tech Mono',monospace;
+  font-size:12px;
+  padding:7px 8px;
+  border-radius:var(--radius);
+  outline:none;
+}
+.mini-form input:focus{ border-color:var(--cyan); }
+.mini-form .fbtns{ display:flex; gap:8px; margin-top:2px; }
+.mini-form button{
+  flex:1;
+  font-family:'Orbitron',sans-serif;
+  font-size:10px;
+  letter-spacing:.1em;
+  padding:7px 0;
+  border-radius:var(--radius);
+  cursor:pointer;
+  border:1px solid var(--cyan-dim);
+  background:transparent;
+  color:var(--cyan);
+}
+.mini-form button.cancel{ border-color:var(--muted); color:var(--muted); }
+.mini-form button:hover{ background:rgba(63,227,255,.12); }
+
+/* ---- center core ---- */
+.core{
+  display:flex; flex-direction:column; align-items:center;
+  padding-top:20px;
+}
+.dial-wrap{ position:relative; width:270px; height:270px; }
+.dial-wrap svg{ width:100%; height:100%; display:block; }
+.ring-outer{
+  transform-origin:135px 135px;
+  animation:spin 14s linear infinite;
+}
+.ring-outer.active{ animation-duration:3.2s; }
+.ring-inner{
+  transform-origin:135px 135px;
+  animation:spin-rev 9s linear infinite;
+}
+.ring-inner.active{ animation-duration:2s; }
+@keyframes spin{ to{ transform:rotate(360deg); } }
+@keyframes spin-rev{ to{ transform:rotate(-360deg); } }
+.arc-progress{
+  stroke-dasharray: 60 340;
+  stroke-dashoffset:0;
+  animation:none;
+}
+.arc-progress.active{ animation:arcmove 3s linear infinite; }
+@keyframes arcmove{ to{ stroke-dashoffset:-400; } }
+
+.core-center{
+  position:absolute; inset:0;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  text-align:center;
+}
+.core-center .label{
+  font-family:'Orbitron',sans-serif;
+  font-size:22px;
+  font-weight:900;
+  letter-spacing:.12em;
+  color:var(--cyan);
+  text-shadow:0 0 14px rgba(63,227,255,.6);
+}
+.core-center .sub{
+  font-family:'Share Tech Mono',monospace;
+  font-size:10px;
+  color:var(--muted);
+  letter-spacing:.15em;
+  margin-top:4px;
+}
+
+.status-line{
+  font-family:'Share Tech Mono',monospace;
+  font-size:12.5px;
+  letter-spacing:.1em;
+  color:var(--muted);
+  margin-top:16px;
+  min-height:16px;
+}
+.status-line.active{ color:var(--cyan); }
+.status-line .dot{
+  display:inline-block; width:7px;height:7px;border-radius:50%;
+  background:var(--danger); margin-right:7px; box-shadow:0 0 8px var(--danger);
+}
+.status-line.active .dot{ background:var(--cyan); box-shadow:0 0 8px var(--cyan); }
+
+.start-btn{
+  margin-top:18px;
+  font-family:'Orbitron',sans-serif;
+  font-size:13px;
+  letter-spacing:.2em;
+  padding:12px 30px;
+  background:transparent;
+  border:1px solid var(--cyan-dim);
+  color:var(--cyan);
+  border-radius:var(--radius);
+  cursor:pointer;
+  clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px);
+  transition:background .2s, box-shadow .2s;
+}
+.start-btn:hover{ background:rgba(63,227,255,.1); }
+.start-btn:disabled{ opacity:.5; cursor:default; }
+.start-btn.active{
+  background:rgba(63,227,255,.12);
+  box-shadow:0 0 24px rgba(63,227,255,.35);
+}
+
+.wave{
+  display:flex; align-items:flex-end; justify-content:center;
+  gap:3px; height:44px; margin-top:20px; width:100%;
+}
+.wave i{
+  display:block; width:4px; border-radius:2px;
+  background:linear-gradient(180deg, var(--cyan), var(--cyan-dim));
+  height:4px;
+  transition:height .12s ease;
+  opacity:.55;
+}
+.wave.active i{ opacity:1; }
+
+.log{
+  width:100%;
+  margin-top:18px;
+  height:110px;
+  overflow-y:auto;
+  border:1px solid var(--line);
+  background:rgba(0,0,0,.3);
+  padding:8px 10px;
+  font-family:'Share Tech Mono',monospace;
+  font-size:11px;
+  line-height:1.7;
+  color:var(--cyan-dim);
+}
+.log p{ margin:0; }
+.log p::before{ content:'> '; color:var(--cyan); }
+.log::-webkit-scrollbar{ width:5px; }
+.log::-webkit-scrollbar-thumb{ background:var(--cyan-dim); }
+
+.export-wrap{
+  max-width:1180px; margin:22px auto 0; text-align:center;
+}
+.export-btn{
+  font-family:'Share Tech Mono',monospace;
+  font-size:11.5px;
+  letter-spacing:.1em;
+  color:var(--muted);
+  background:transparent;
+  border:1px solid var(--line);
+  padding:9px 18px;
+  border-radius:var(--radius);
+  cursor:pointer;
+}
+.export-btn:hover{ color:var(--cyan); border-color:var(--cyan-dim); }
+</style>
+</head>
+<body>
+
+<p class="eyebrow">SISTEMA DE ACESSO RÁPIDO</p>
+<h1 class="title">J . A . R . V . I . S</h1>
+
+<div class="grid">
+
+  <!-- LEFT: BROWSERS -->
+  <aside class="panel" id="col-browsers">
+    <h2>NAVEGADORES <span class="count" id="browser-count"></span></h2>
+    <div id="browser-list"></div>
+    <button class="add-row" data-add="browser">+ ADICIONAR NAVEGADOR</button>
+    <div class="mini-form" id="form-browser">
+      <input type="text" placeholder="Nome do navegador" id="nb-name">
+      <input type="text" placeholder="Comando/executável (ex: chrome, msedge, firefox)" id="nb-cmd">
+      <div class="fbtns">
+        <button data-save="browser">SALVAR</button>
+        <button class="cancel" data-cancel="browser">CANCELAR</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- CENTER: CORE -->
+  <main class="panel core">
+    <div class="dial-wrap">
+      <svg viewBox="0 0 270 270">
+        <circle cx="135" cy="135" r="128" fill="none" stroke="rgba(63,227,255,.08)" stroke-width="1"/>
+        <g class="ring-outer" id="ring-outer">
+          <circle cx="135" cy="135" r="118" fill="none" stroke="var(--cyan-dim)" stroke-width="1.4" stroke-dasharray="2 6"/>
+          <circle class="arc-progress" id="arc1" cx="135" cy="135" r="118" fill="none" stroke="var(--cyan)" stroke-width="3" stroke-linecap="round"/>
+        </g>
+        <g class="ring-inner" id="ring-inner">
+          <circle cx="135" cy="135" r="96" fill="none" stroke="rgba(63,227,255,.35)" stroke-width="1"/>
+          <circle class="arc-progress" id="arc2" cx="135" cy="135" r="96" fill="none" stroke="var(--amber)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="40 300"/>
+        </g>
+        <circle cx="135" cy="135" r="70" fill="none" stroke="rgba(63,227,255,.15)" stroke-width="1"/>
+      </svg>
+      <div class="core-center">
+        <div class="label" id="core-label">STANDBY</div>
+        <div class="sub">CORE STATUS</div>
+      </div>
+    </div>
+
+    <div class="status-line" id="status-line"><span class="dot"></span><span id="status-text">AGUARDANDO ATIVAÇÃO</span></div>
+
+    <button class="start-btn" id="start-btn">INICIAR J.A.R.V.I.S</button>
+
+    <div class="wave" id="wave"></div>
+
+    <div class="log" id="log"></div>
+  </main>
+
+  <!-- RIGHT: APPS -->
+  <aside class="panel" id="col-apps">
+    <h2>APLICATIVOS <span class="count" id="app-count"></span></h2>
+    <div id="app-list"></div>
+    <button class="add-row" data-add="app">+ ADICIONAR APLICATIVO</button>
+    <div class="mini-form" id="form-app">
+      <input type="text" placeholder="Nome do aplicativo" id="na-name">
+      <input type="text" placeholder="Comando/executável (ex: notepad, calc, WINWORD.EXE)" id="na-cmd">
+      <div class="fbtns">
+        <button data-save="app">SALVAR</button>
+        <button class="cancel" data-cancel="app">CANCELAR</button>
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<div class="export-wrap">
+  <button class="export-btn" id="export-btn">⭳ EXPORTAR DADOS (JSON)</button>
+</div>
+
+<script>
+/* ---------------- ícones ---------------- */
+const iconPaths = {
+  globe:'M12 2a10 10 0 100 20 10 10 0 000-20zm0 0c2.5 2.5 4 5.8 4 10s-1.5 7.5-4 10m0-20c-2.5 2.5-4 5.8-4 10s1.5 7.5 4 10M2.5 9h19M2.5 15h19',
+  app:'M4 4h6v6H4V4zm10 0h6v6h-6V4zM4 14h6v6H4v-6zm10 0h6v6h-6v-6z'
+};
+function iconSVG(){
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="${iconPaths.globe}"/></svg>`;
+}
+function appIconSVG(){
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="${iconPaths.app}"/></svg>`;
+}
+
+/* ---------------- api ---------------- */
+async function apiGet(url){
+  const r = await fetch(url);
+  return r.json();
+}
+async function apiPost(url, body){
+  const r = await fetch(url, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(body || {})
+  });
+  return r.json();
+}
+
+/* ---------------- estado local ---------------- */
+let appData = { browsers: [], sites: [], apps: [] };
+let lastSeq = 0;
+
+const browserList = document.getElementById('browser-list');
+const appList = document.getElementById('app-list');
+const logEl = document.getElementById('log');
+
+function appendLog(time, msg){
+  const p = document.createElement('p');
+  p.textContent = `[${time}] ${msg}`;
+  logEl.appendChild(p);
+  logEl.scrollTop = logEl.scrollHeight;
+}
+
+/* ---------------- render: navegadores + sites ---------------- */
+function renderBrowsers(){
+  browserList.innerHTML = '';
+  const browsers = appData.browsers || [];
+  document.getElementById('browser-count').textContent = browsers.length;
+
+  browsers.forEach(b=>{
+    const item = document.createElement('div');
+    item.className = 'item';
+    item.innerHTML = `<span class="ic">${iconSVG()}</span><span class="lbl">${b.nome}</span><span class="chev">▶</span>`;
+
+    const sub = document.createElement('div');
+    sub.className = 'sublist';
+
+    (appData.sites || []).filter(s => s.browser === b.key).forEach(site=>{
+      const a = document.createElement('a');
+      a.href = '#';
+      a.textContent = site.nome;
+      a.title = site.url || '';
+      a.addEventListener('click', async e=>{
+        e.preventDefault();
+        e.stopPropagation();
+        await apiPost('/api/open-site', {key: site.key, browser: b.key});
+        pollState();
+      });
+      sub.appendChild(a);
+    });
+
+    const addSiteBtn = document.createElement('button');
+    addSiteBtn.className = 'add-row';
+    addSiteBtn.style.marginTop = '6px';
+    addSiteBtn.textContent = '+ ADICIONAR SITE';
+    addSiteBtn.addEventListener('click', async e=>{
+      e.stopPropagation();
+      const siteName = prompt('Nome do site:');
+      if(!siteName) return;
+      const siteUrl = prompt('URL do site (ex: https://exemplo.com):','https://');
+      if(!siteUrl) return;
+      const res = await apiPost('/api/apps', {kind:'site', nome:siteName, url:siteUrl, browser:b.key});
+      if(res.error){ alert(res.error); return; }
+      await refreshApps();
+    });
+    sub.appendChild(addSiteBtn);
+
+    item.addEventListener('click', async ()=>{
+      const wasOpen = item.classList.contains('open');
+      document.querySelectorAll('#browser-list .item').forEach(i=>i.classList.remove('open'));
+      if(!wasOpen){
+        item.classList.add('open');
+        await apiPost('/api/open', {key: b.key});
+        pollState();
+      }
+    });
+
+    browserList.appendChild(item);
+    browserList.appendChild(sub);
+  });
+
+  // sites cadastrados sem navegador específico associado
+  const orphanSites = (appData.sites || []).filter(s => !s.browser);
+  if (orphanSites.length){
+    const item = document.createElement('div');
+    item.className = 'item';
+    item.innerHTML = `<span class="ic">${iconSVG()}</span><span class="lbl">Qualquer navegador</span><span class="chev">▶</span>`;
+    const sub = document.createElement('div');
+    sub.className = 'sublist';
+    orphanSites.forEach(site=>{
+      const a = document.createElement('a');
+      a.href = '#';
+      a.textContent = site.nome;
+      a.addEventListener('click', async e=>{
+        e.preventDefault();
+        e.stopPropagation();
+        await apiPost('/api/open-site', {key: site.key});
+        pollState();
+      });
+      sub.appendChild(a);
+    });
+    item.addEventListener('click', ()=>{
+      const wasOpen = item.classList.contains('open');
+      document.querySelectorAll('#browser-list .item').forEach(i=>i.classList.remove('open'));
+      if(!wasOpen) item.classList.add('open');
+    });
+    browserList.appendChild(item);
+    browserList.appendChild(sub);
+  }
+}
+
+/* ---------------- render: aplicativos ---------------- */
+function renderApps(){
+  appList.innerHTML = '';
+  const apps = appData.apps || [];
+  document.getElementById('app-count').textContent = apps.length;
+
+  apps.forEach(a=>{
+    const item = document.createElement('div');
+    item.className = 'item';
+    item.innerHTML = `<span class="ic">${appIconSVG()}</span><span class="lbl">${a.nome}</span>`;
+
+    const closeBtn = document.createElement('span');
+    closeBtn.className = 'close-x';
+    closeBtn.textContent = '✕';
+    closeBtn.title = 'Encerrar';
+    closeBtn.addEventListener('click', async e=>{
+      e.stopPropagation();
+      if(!confirm(`Encerrar ${a.nome}?`)) return;
+      await apiPost('/api/close', {key: a.key});
+      pollState();
+    });
+    item.appendChild(closeBtn);
+
+    item.addEventListener('click', async ()=>{
+      item.style.borderColor = 'var(--cyan)';
+      await apiPost('/api/open', {key: a.key});
+      pollState();
+      setTimeout(()=>{ item.style.borderColor = ''; }, 600);
+    });
+
+    appList.appendChild(item);
+  });
+}
+
+async function refreshApps(){
+  appData = await apiGet('/api/apps');
+  renderBrowsers();
+  renderApps();
+}
+
+/* ---------------- formulários de cadastro ---------------- */
+document.querySelectorAll('[data-add]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.getElementById('form-'+btn.dataset.add).classList.add('show');
+  });
+});
+document.querySelectorAll('[data-cancel]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.getElementById('form-'+btn.dataset.cancel).classList.remove('show');
+  });
+});
+
+document.querySelector('[data-save="browser"]').addEventListener('click', async ()=>{
+  const nome = document.getElementById('nb-name').value.trim();
+  const comando = document.getElementById('nb-cmd').value.trim();
+  if(!nome || !comando){ alert('Preencha nome e comando/executável.'); return; }
+  const res = await apiPost('/api/apps', {kind:'browser', nome, comando});
+  if(res.error){ alert(res.error); return; }
+  document.getElementById('nb-name').value = '';
+  document.getElementById('nb-cmd').value = '';
+  document.getElementById('form-browser').classList.remove('show');
+  await refreshApps();
+});
+
+document.querySelector('[data-save="app"]').addEventListener('click', async ()=>{
+  const nome = document.getElementById('na-name').value.trim();
+  const comando = document.getElementById('na-cmd').value.trim();
+  if(!nome || !comando){ alert('Preencha nome e comando/executável.'); return; }
+  const res = await apiPost('/api/apps', {kind:'app', nome, comando});
+  if(res.error){ alert(res.error); return; }
+  document.getElementById('na-name').value = '';
+  document.getElementById('na-cmd').value = '';
+  document.getElementById('form-app').classList.remove('show');
+  await refreshApps();
+});
+
+/* ---------------- core / status do jarvis ---------------- */
+const startBtn = document.getElementById('start-btn');
+const ringOuter = document.getElementById('ring-outer');
+const ringInner = document.getElementById('ring-inner');
+const arc1 = document.getElementById('arc1');
+const arc2 = document.getElementById('arc2');
+const statusLine = document.getElementById('status-line');
+const statusText = document.getElementById('status-text');
+const coreLabel = document.getElementById('core-label');
+const wave = document.getElementById('wave');
+let active = false;
+
+for(let i=0;i<40;i++){
+  const bar = document.createElement('i');
+  wave.appendChild(bar);
+}
+function animateWave(){
+  document.querySelectorAll('#wave i').forEach(bar=>{
+    const h = active ? (4 + Math.random()*40) : (2 + Math.random()*5);
+    bar.style.height = h+'px';
+  });
+}
+setInterval(animateWave, 130);
+
+function applyState(st){
+  active = !!st.active;
+  [ringOuter,ringInner,arc1,arc2].forEach(el=>el.classList.toggle('active', active));
+  startBtn.classList.toggle('active', active);
+  statusLine.classList.toggle('active', active);
+  wave.classList.toggle('active', active);
+  startBtn.textContent = active ? 'DESATIVAR J.A.R.V.I.S' : 'INICIAR J.A.R.V.I.S';
+  coreLabel.textContent = st.label || (active ? 'ONLINE' : 'STANDBY');
+  statusText.textContent = st.text || (active ? 'SISTEMA OPERACIONAL — OUVINDO' : 'AGUARDANDO ATIVAÇÃO');
+
+  (st.log || []).forEach(entry=>{
+    appendLog(entry.time, entry.msg);
+    lastSeq = Math.max(lastSeq, entry.seq);
+  });
+}
+
+async function pollState(){
+  try{
+    const st = await apiGet('/api/state?since=' + lastSeq);
+    applyState(st);
+  }catch(e){
+    // servidor momentaneamente indisponível — só tenta de novo no próximo ciclo
+  }
+}
+
+startBtn.addEventListener('click', async ()=>{
+  startBtn.disabled = true;
+  try{
+    if(!active){
+      const res = await apiPost('/api/start');
+      if(res.error){ alert(res.error); }
+    } else {
+      await apiPost('/api/stop');
+    }
+    await pollState();
+  } finally {
+    startBtn.disabled = false;
+  }
+});
+
+/* ---------------- exportar ---------------- */
+document.getElementById('export-btn').addEventListener('click', ()=>{
+  window.location.href = '/api/apps/export';
+});
+
+/* ---------------- init ---------------- */
+appendLog(new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'}), 'Painel carregado. Conectando ao servidor...');
+refreshApps();
+pollState();
+setInterval(pollState, 600);
+</script>
+</body>
+</html>

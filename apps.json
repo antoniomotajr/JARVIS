@@ -1,0 +1,152 @@
+{
+  "youtube": {
+    "nome": "YouTube",
+    "aliases": [
+      "youtube",
+      "you tube",
+      "iutubi"
+    ],
+    "type": "url",
+    "url": "https://www.youtube.com/",
+    "browser": "chrome"
+  },
+  "linkedin": {
+    "nome": "LinkedIn",
+    "aliases": [
+      "linkedin",
+      "linked in",
+      "linkindin",
+      "lkd"
+    ],
+    "type": "url",
+    "url": "https://www.linkedin.com/feed/",
+    "browser": "chrome"
+  },
+  "firefox": {
+    "nome": "Firefox",
+    "aliases": [
+      "firefox",
+      "fire fox",
+      "navegador firefox",
+      "mozilla firefox"
+    ],
+    "type": "browser",
+    "exe": "firefox.exe",
+    "open_cmd": "firefox"
+  },
+  "chrome": {
+    "nome": "Google Chrome",
+    "aliases": [
+      "chrome",
+      "google chrome",
+      "navegador chrome"
+    ],
+    "type": "browser",
+    "exe": "chrome.exe",
+    "open_cmd": "chrome"
+  },
+  "edge": {
+    "nome": "Microsoft Edge",
+    "aliases": [
+      "edge",
+      "microsoft edge",
+      "navegador edge",
+      "edige",
+      "edg"
+    ],
+    "type": "browser",
+    "exe": "msedge.exe",
+    "open_cmd": "msedge"
+  },
+  "notepad": {
+    "nome": "Bloco de Notas",
+    "aliases": [
+      "bloco de notas",
+      "notepad"
+    ],
+    "exe": "notepad.exe",
+    "open_cmd": "notepad"
+  },
+  "wordpad": {
+    "nome": "WordPad",
+    "aliases": [
+      "wordpad",
+      "word pad",
+      "worpad",
+      "wordipedi"
+    ],
+    "exe": "wordpad.exe",
+    "open_cmd": "write"
+  },
+  "calculadora": {
+    "nome": "Calculadora",
+    "aliases": [
+      "calculadora",
+      "calculator"
+    ],
+    "exe": "CalculatorApp.exe",
+    "open_cmd": "calc"
+  },
+  "explorer": {
+    "nome": "Explorador de Arquivos",
+    "aliases": [
+      "explorador de arquivos",
+      "explorer",
+      "gerenciador de arquivos",
+      "esplorer"
+    ],
+    "exe": "explorer.exe",
+    "open_cmd": "explorer"
+  },
+  "vscode": {
+    "nome": "Visual Studio Code",
+    "aliases": [
+      "vscode",
+      "vs code",
+      "visual studio code",
+      "code"
+    ],
+    "exe": "Code.exe",
+    "open_cmd": "code"
+  },
+  "spotify": {
+    "nome": "Spotify",
+    "aliases": [
+      "spotify",
+      "spotifai"
+    ],
+    "exe": "Spotify.exe",
+    "open_cmd": "spotify"
+  },
+  "word": {
+    "nome": "Word",
+    "aliases": [
+      "word",
+      "microsoft word",
+      "uord",
+      "ordi"
+    ],
+    "exe": "WINWORD.EXE",
+    "open_cmd": "winword"
+  },
+  "excel": {
+    "nome": "Excel",
+    "aliases": [
+      "excel",
+      "microsoft excel",
+      "excell",
+      "eqsel"
+    ],
+    "exe": "EXCEL.EXE",
+    "open_cmd": "excel"
+  },
+  "instagram": {
+    "nome": "Instagram",
+    "aliases": [
+      "instagram"
+    ],
+    "type": "url",
+    "url": "https://www.instagram.com/",
+    "browser": "chrome"
+  }
+}
